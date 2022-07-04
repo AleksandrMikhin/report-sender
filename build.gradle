@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    lombokVersion='1.18.22'
+}
+
+dependencies {
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'jakarta.xml.soap:jakarta.xml.soap-api:3.0.0'
+    implementation 'com.sun.xml.messaging.saaj:saaj-impl:3.0.0'
+    implementation 'javax.servlet:jstl:1.2'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+
+    implementation 'com.itextpdf:itextpdf:5.5.10'
+
+
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+}
+
+war{
+    archiveName 'sender.war'
+}
