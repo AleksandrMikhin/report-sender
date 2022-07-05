@@ -11,7 +11,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.example.sender.entity.Team;
-import org.example.sender.entity.User;
+import org.example.sender.entity.SingleReport;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,16 +65,16 @@ public class PDFReportProvider implements ReportProvider{
                     table.addCell(header);
                 });
 
-        for (final User user : team.getUsers()) {
-            table.addCell(user.getFirstName() + " " + user.getLastName());
-            table.addCell(getTasksCell(user));
+        for (final SingleReport singleReport : team.getSingleReports()) {
+            table.addCell(singleReport.getFirstName() + " " + singleReport.getLastName());
+            table.addCell(getTasksCell(singleReport));
         }
         return table;
     }
 
-    private PdfPCell getTasksCell(final User user) {
+    private PdfPCell getTasksCell(final SingleReport singleReport) {
         final PdfPTable table = new PdfPTable(1);
-        user.getTasks().forEach(table::addCell);
+        singleReport.getTasks().forEach(table::addCell);
         return new PdfPCell(table);
     }
 

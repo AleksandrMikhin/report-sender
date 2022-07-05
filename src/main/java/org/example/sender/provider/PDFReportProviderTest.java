@@ -11,7 +11,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.example.sender.entity.Team;
-import org.example.sender.entity.User;
+import org.example.sender.entity.SingleReport;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,12 +23,12 @@ import java.util.stream.Stream;
 
 public class PDFReportProviderTest implements ReportProvider{
 
-    static final User user1 = new User("firstName1", "lastName1", List.of("task1", "task2", "task3"));
-    static final User user2 = new User("firstName2", "lastName2", List.of("task4", "task5", "task6"));
-    static final User user3 = new User("firstName3", "lastName3", List.of("task7", "task8", "task9"));
-    static final Team team1 = new Team("team1", List.of(user1, user2, user3));
-    static final Team team2 = new Team("team2", List.of(user1, user2, user3));
-    static final Team team3 = new Team("team3", List.of(user1, user2, user3));
+    static final SingleReport SINGLE_REPORT_1 = new SingleReport("firstName1", "lastName1", List.of("task1", "task2", "task3"));
+    static final SingleReport SINGLE_REPORT_2 = new SingleReport("firstName2", "lastName2", List.of("task4", "task5", "task6"));
+    static final SingleReport SINGLE_REPORT_3 = new SingleReport("firstName3", "lastName3", List.of("task7", "task8", "task9"));
+    static final Team team1 = new Team("team1", List.of(SINGLE_REPORT_1, SINGLE_REPORT_2, SINGLE_REPORT_3));
+    static final Team team2 = new Team("team2", List.of(SINGLE_REPORT_1, SINGLE_REPORT_2, SINGLE_REPORT_3));
+    static final Team team3 = new Team("team3", List.of(SINGLE_REPORT_1, SINGLE_REPORT_2, SINGLE_REPORT_3));
     static final List<Team> teams = List.of(team1, team2, team3);
 
     public static void main(String[] args) {
@@ -43,11 +43,11 @@ public class PDFReportProviderTest implements ReportProvider{
     final static Font teamFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 12, BaseColor.BLACK);
 
     @Override
-    public File createReport(final List<Team> teams1, final Date reportDate) throws DocumentException, IOException {
+    public File createReport(final List<Team> teams, final Date reportDate) throws DocumentException, IOException {
         final Document document = new Document();
 
-        final File tempFile = File.createTempFile("report", ".pdf");
-//        final File tempFile = new File("c:\\!_Github\\report.pdf");
+//        final File tempFile = File.createTempFile("report", ".pdf");
+        final File tempFile = new File("/home/mansur/IdeaProjects/report-sender/files/report.pdf");
         PdfWriter.getInstance(document, new FileOutputStream(tempFile));
 
         document.open();
@@ -79,16 +79,16 @@ public class PDFReportProviderTest implements ReportProvider{
                     table.addCell(header);
                 });
 
-        for (final User user : team.getUsers()) {
-            table.addCell(user.getFirstName() + " " + user.getLastName());
-            table.addCell(getTasksCell(user));
+        for (final SingleReport singleReport : team.getSingleReports()) {
+            table.addCell(singleReport.getFirstName() + " " + singleReport.getLastName());
+            table.addCell(getTasksCell(singleReport));
         }
         return table;
     }
 
-    private PdfPCell getTasksCell(final User user) {
+    private PdfPCell getTasksCell(final SingleReport singleReport) {
         final PdfPTable table = new PdfPTable(1);
-        user.getTasks().forEach(table::addCell);
+        singleReport.getTasks().forEach(table::addCell);
         return new PdfPCell(table);
     }
 

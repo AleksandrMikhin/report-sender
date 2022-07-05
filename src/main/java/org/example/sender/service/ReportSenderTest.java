@@ -1,5 +1,6 @@
 package org.example.sender.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.soap.AttachmentPart;
 import jakarta.xml.soap.MessageFactory;
@@ -9,6 +10,7 @@ import jakarta.xml.soap.SOAPEnvelope;
 import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPMessage;
 import jakarta.xml.soap.SOAPPart;
+import org.example.sender.entity.Team;
 import org.example.sender.provider.ReportProvider;
 import org.example.sender.utils.PropertiesUtils;
 
@@ -22,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -55,9 +58,8 @@ public class ReportSenderTest<T extends ReportProvider> implements Runnable {
         final Date reportDate = new Date();
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-//            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {
-//            });
-            final File reportFile = reportProvider.createReport(null, reportDate);
+            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
+            final File reportFile = reportProvider.createReport(teams, reportDate);
             sendReport(reportFile);
         } catch (Exception e) {
             e.printStackTrace();

@@ -20,15 +20,13 @@ import org.example.sender.entity.Team;
 import org.example.sender.provider.ReportProvider;
 import org.example.sender.utils.PropertiesUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
@@ -63,8 +61,12 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
         final Date reportDate = new Date();
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
+            //todo вряд ли заработает
+            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {
+            });
             final File reportFile = reportProvider.createReport(teams, reportDate);
+            CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
+            Files.copy(new FileInputStream(reportFile), Path.of("/home/mansur/IdeaProjects/report-sender/files/report.pdf"), options);
             sendReport(reportFile);
         } catch (Exception e) {
             e.printStackTrace();

@@ -12,9 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Team {
+public class SingleReport {
 
-    private  String color;
-    private  List<SingleReport> singleReports;
+    private String firstName;
+    private String lastName;
+    private List<String> tasks;
 
 }
