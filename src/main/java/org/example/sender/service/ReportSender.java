@@ -65,8 +65,7 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
             final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {
             });
             final File reportFile = reportProvider.createReport(teams, reportDate);
-            CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-            Files.copy(new FileInputStream(reportFile), Path.of("/home/mansur/IdeaProjects/report-sender/files/report.pdf"), options);
+
             sendReport(reportFile);
         } catch (Exception e) {
             e.printStackTrace();
