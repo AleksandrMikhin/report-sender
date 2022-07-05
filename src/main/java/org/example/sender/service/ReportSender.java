@@ -61,7 +61,6 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
         final Date reportDate = new Date();
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-            //todo вряд ли заработает
             final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {
             });
             final File reportFile = reportProvider.createReport(teams, reportDate);
