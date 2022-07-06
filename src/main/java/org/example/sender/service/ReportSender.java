@@ -99,22 +99,31 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
 
             final SOAPBody soapBody = envelope.getBody();
             final SOAPElement bodyChild = soapBody.addChildElement(REPORT_ACTION, SOAP_NAME_SPACE);
-            final SOAPElement fileChild = bodyChild.addChildElement(FILE_ELEMENT_ID);
+//            final SOAPElement fileChild = bodyChild.addChildElement(FILE_ELEMENT_ID);
+//            fileChild.addTextNode(ATTACHMENT_CONTENT_ID);
+
+            final SOAPElement fileChild = bodyChild.addChildElement("array");
+            final SOAPElement byteArray = fileChild.addChildElement("bytes");
+            final SOAPElement fileName = fileChild.addChildElement("bytes");
+
             fileChild.addTextNode(ATTACHMENT_CONTENT_ID);
+
+
+//TODO: need to refactor to attachment (doesn't work correctly right now)
 
 //            final DataSource dataSource = new FileDataSource(reportFile);
 //            final DataHandler dataHandler = new DataHandler(dataSource);
 //            final AttachmentPart attachment = soapMessage.createAttachmentPart(dataHandler);
 //            attachment.setContentId(ATTACHMENT_CONTENT_ID);
 //            soapMessage.addAttachmentPart(attachment);
-
-            final MimeHeaders mimeHeaders = soapMessage.getMimeHeaders();
-            mimeHeaders.addHeader(SOAP_ACTION_HEADER, REPORT_SOAP_ACTION);
-
-            final AttachmentPart attachment = soapMessage.createAttachmentPart();
-            attachment.setContentId(ATTACHMENT_CONTENT_ID);
-            attachment.setRawContent(targetStream, Files.probeContentType(reportFile.toPath()));
-            soapMessage.addAttachmentPart(attachment);
+//
+//            final MimeHeaders mimeHeaders = soapMessage.getMimeHeaders();
+//            mimeHeaders.addHeader(SOAP_ACTION_HEADER, REPORT_SOAP_ACTION);
+//
+//            final AttachmentPart attachment = soapMessage.createAttachmentPart();
+//            attachment.setContentId(ATTACHMENT_CONTENT_ID);
+//            attachment.setRawContent(targetStream, Files.probeContentType(reportFile.toPath()));
+//            soapMessage.addAttachmentPart(attachment);
             soapMessage.saveChanges();
         }
 

@@ -61,7 +61,7 @@ public class PDFReportProviderTest implements ReportProvider{
     private static final String DATE_FORMAT_PATTERN = "yyyy_MM_dd";
 
     @Override
-    public File createReport(final List<Team> teams1, final Date reportDate) throws DocumentException, IOException {
+    public File createReport(final List<Team> teams, final Date reportDate) throws DocumentException, IOException {
         final DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_PATTERN);
 //        final File tempReportFile = File.createTempFile(formatter.format(reportDate) + "_daily_report", ".pdf");
         final File tempReportFile = new File("c:\\!_Github\\report.pdf");

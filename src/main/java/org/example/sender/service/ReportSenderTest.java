@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.soap.AttachmentPart;
 import jakarta.xml.soap.MessageFactory;
 import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPConnection;
+import jakarta.xml.soap.SOAPConnectionFactory;
 import jakarta.xml.soap.SOAPElement;
 import jakarta.xml.soap.SOAPEnvelope;
 import jakarta.xml.soap.SOAPException;
@@ -12,6 +14,7 @@ import jakarta.xml.soap.SOAPMessage;
 import jakarta.xml.soap.SOAPPart;
 import org.example.sender.entity.Team;
 import org.example.sender.provider.ReportProvider;
+import org.example.sender.utils.FileUtils;
 import org.example.sender.utils.PropertiesUtils;
 
 import java.io.BufferedReader;
@@ -58,9 +61,9 @@ public class ReportSenderTest<T extends ReportProvider> implements Runnable {
         final Date reportDate = new Date();
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-//            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
-//            final File reportFile = reportProvider.createReport(teams, reportDate);
-            final File reportFile = reportProvider.createReport(null, reportDate);
+            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
+            final File reportFile = reportProvider.createReport(teams, reportDate);
+//            final File reportFile = reportProvider.createReport(null, reportDate);
             sendReport(reportFile);
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,7 +98,14 @@ public class ReportSenderTest<T extends ReportProvider> implements Runnable {
 
             final SOAPBody soapBody = envelope.getBody();
             final SOAPElement bodyChild = soapBody.addChildElement(REPORT_ACTION, SOAP_NAME_SPACE);
-            final SOAPElement fileChild = bodyChild.addChildElement(FILE_ELEMENT_ID);
+//            final SOAPElement fileChild = bodyChild.addChildElement(FILE_ELEMENT_ID);
+//            fileChild.addTextNode(ATTACHMENT_CONTENT_ID);
+
+            final SOAPElement fileChild = bodyChild.addChildElement("array");
+            final SOAPElement byteArray = fileChild.addChildElement("bytes");
+            byteArray.addTextNode(FileUtils.getChairSequence(reportFile));
+            final SOAPElement fileName = fileChild.addChildElement("bytes");
+            fileName.addTextNode(reportFile.getName());
             fileChild.addTextNode(ATTACHMENT_CONTENT_ID);
 
 //            final DataSource dataSource = new FileDataSource(reportFile);
@@ -109,10 +119,10 @@ public class ReportSenderTest<T extends ReportProvider> implements Runnable {
 //            final MimeHeaders mimeHeaders = soapMessage.getMimeHeaders();
 //            mimeHeaders.addHeader(SOAP_ACTION_HEADER, REPORT_SOAP_ACTION);
 
-            final AttachmentPart attachment = soapMessage.createAttachmentPart();
-            attachment.setContentId(ATTACHMENT_CONTENT_ID);
-            attachment.setRawContent(targetStream, Files.probeContentType(reportFile.toPath()));
-            soapMessage.addAttachmentPart(attachment);
+//            final AttachmentPart attachment = soapMessage.createAttachmentPart();
+//            attachment.setContentId(ATTACHMENT_CONTENT_ID);
+//            attachment.setRawContent(targetStream, Files.probeContentType(reportFile.toPath()));
+//            soapMessage.addAttachmentPart(attachment);
             soapMessage.saveChanges();
 
             System.out.println("-----------Request SOAP Message---------------");
@@ -121,9 +131,9 @@ public class ReportSenderTest<T extends ReportProvider> implements Runnable {
 
         }
 
-//        final SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
-//        try (final SOAPConnection soapConnection = soapConnectionFactory.createConnection()) {
-//            soapConnection.call(soapMessage, REPORT_SEND_URL);
-//        }
+        final SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+        try (final SOAPConnection soapConnection = soapConnectionFactory.createConnection()) {
+            soapConnection.call(soapMessage, REPORT_SEND_URL);
+        }
     }
 }
