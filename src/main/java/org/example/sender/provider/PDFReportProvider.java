@@ -4,14 +4,15 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.example.sender.entity.Team;
 import org.example.sender.entity.SingleReport;
+import org.example.sender.utils.PropertiesUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,27 +26,40 @@ import java.util.stream.Stream;
 
 public class PDFReportProvider implements ReportProvider{
 
+    private static final BaseFont BASE_FONT;
+    static {
+        try {
+            final String FONT_PATH = PropertiesUtils.getProperty("sender.base-font.path");
+            BASE_FONT = BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        } catch (IOException | DocumentException e) {
+            throw new RuntimeException("Base font not found" , e);
+        }
+    }
+
+    private static final Font HEADER_FONT = new Font(BASE_FONT, 16, Font.NORMAL, BaseColor.BLACK);
+    private static final Font TEAM_FONT = new Font(BASE_FONT, 12, Font.BOLD, BaseColor.BLACK);
+    private static final Font MAIN_FONT = new Font(BASE_FONT, 10, Font.NORMAL, BaseColor.BLACK);
     private static final String DATE_FORMAT_PATTERN = "yyyy_MM_dd";
-    private static final Font headerFont = FontFactory.getFont(FontFactory.TIMES_BOLD, 16, BaseColor.BLACK);
-    private static final Font teamFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 12, BaseColor.BLACK);
 
     @Override
     public File createReport(final List<Team> teams, final Date reportDate) throws DocumentException, IOException {
         final DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_PATTERN);
         final File tempReportFile = File.createTempFile(formatter.format(reportDate) + "_daily_report", ".pdf");
+//        final File tempReportFile = new File("c:\\!_Github\\report.pdf");
 
         final Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream(tempReportFile));
+
         document.open();
 
         final Paragraph headerParagraph = new Paragraph();
-        headerParagraph.add(new Paragraph("Daily generated: " + reportDate, headerFont));
+        headerParagraph.add(new Paragraph("Daily generated: " + reportDate, HEADER_FONT));
         addEmptyLine(headerParagraph, 1);
         document.add(headerParagraph);
 
         for (final Team team : teams) {
             final Paragraph teamParagraph = new Paragraph();
-            teamParagraph.add(new Paragraph("Team: " + team.getColor(), teamFont));
+            teamParagraph.add(new Paragraph("Team: " + team.getColor(), TEAM_FONT));
             addEmptyLine(teamParagraph, 1);
             document.add(teamParagraph);
             document.add(createTeamTable(team));
@@ -54,27 +68,37 @@ public class PDFReportProvider implements ReportProvider{
         return tempReportFile;
     }
 
-    private PdfPTable createTeamTable(final Team team) {
+    private PdfPTable createTeamTable(final Team team) throws DocumentException {
         final PdfPTable table = new PdfPTable(2);
-        Stream.of("User name", "Activity")
+        Stream.of("Student", "Activity")
                 .forEach(columnTitle -> {
-                    final PdfPCell header = new PdfPCell();
+                    final PdfPCell header = new PdfPCell(new Phrase(columnTitle));
                     header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    header.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                     header.setBorderWidth(2);
-                    header.setPhrase(new Phrase(columnTitle));
                     table.addCell(header);
                 });
 
         for (final SingleReport singleReport : team.getSingleReports()) {
-            table.addCell(singleReport.getFirstName() + " " + singleReport.getLastName());
+            table.addCell(new Paragraph(singleReport.getLastName() + " " + singleReport.getFirstName(), MAIN_FONT));
             table.addCell(getTasksCell(singleReport));
         }
         return table;
     }
 
-    private PdfPCell getTasksCell(final SingleReport singleReport) {
-        final PdfPTable table = new PdfPTable(1);
-        singleReport.getTasks().forEach(table::addCell);
+    private PdfPCell getTasksCell(final SingleReport singleReport) throws DocumentException {
+        final PdfPTable table = new PdfPTable(2);
+        table.setWidths(new int[]{85, 15});
+        singleReport.getTasks()
+                .forEach(task -> {
+                    table.addCell(new Paragraph(task.getText(), MAIN_FONT));
+
+                    final PdfPCell spentTimeCell = new PdfPCell(
+                            new Paragraph(Double.toString(task.getTimeSpent()), MAIN_FONT));
+                    spentTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
+                    spentTimeCell.setBorder(3);
+                    table.addCell(spentTimeCell);
+                });
         return new PdfPCell(table);
     }
 

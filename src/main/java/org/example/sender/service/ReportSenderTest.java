@@ -58,8 +58,9 @@ public class ReportSenderTest<T extends ReportProvider> implements Runnable {
         final Date reportDate = new Date();
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
-            final File reportFile = reportProvider.createReport(teams, reportDate);
+//            final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
+//            final File reportFile = reportProvider.createReport(teams, reportDate);
+            final File reportFile = reportProvider.createReport(null, reportDate);
             sendReport(reportFile);
         } catch (Exception e) {
             e.printStackTrace();
