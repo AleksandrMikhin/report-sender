@@ -19,7 +19,7 @@ public class AppListener implements ServletContextListener {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Override
-    public void contextInitialized(ServletContextEvent event) {
+    public void contextInitialized(final ServletContextEvent event) {
         final ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("GMT+3"));
         final ZonedDateTime nextRunTime = currentTime.withHour(0).withMinute(1).withSecond(0);
         //ZonedDateTime nextRunTime = currentTime.withHour(22).withMinute(0).withSecond(0);
@@ -38,7 +38,7 @@ public class AppListener implements ServletContextListener {
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public void contextDestroyed(final ServletContextEvent event) {
         scheduler.shutdownNow();
     }
 }
