@@ -18,7 +18,7 @@ public final class FileUtils {
                 sb.append(in.readLine()).append("\n");
             }
             sb.deleteCharAt(sb.length() - 1);
-            return sb;
+            return sb.toString();
         }
     }
 }
