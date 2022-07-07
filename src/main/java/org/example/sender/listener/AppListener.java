@@ -1,11 +1,11 @@
 package org.example.sender.listener;
 
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 import org.example.sender.provider.PDFReportProvider;
 import org.example.sender.service.ReportSender;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
