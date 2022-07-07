@@ -9,9 +9,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Team {
+public class SingleReport {
 
-    private String color;
-    private List<SingleReport> singleReports;
+    private String firstName;
+    private String lastName;
+    private List<TrackMinInfo> tasks;
 
 }

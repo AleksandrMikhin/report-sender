@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PropertiesUtils {
+public final class PropertiesUtils {
     final static private Properties properties;
 
     static {
