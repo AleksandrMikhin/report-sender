@@ -54,14 +54,20 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
 
     @Override
     public void run() {
-        final Date reportDate = new Date();
+        final File reportFile;
         try {
+            final Date reportDate = new Date();
             final ObjectMapper objectMapper = new ObjectMapper();
             final List<Team> teams = objectMapper.readValue(getReport(reportDate), new TypeReference<>() {});
-            final File reportFile = reportProvider.createReport(teams, reportDate);
-            sendReport(reportFile);
+            reportFile = reportProvider.createReport(teams, reportDate);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Something went wrong with an accountant service", e);
+        }
+
+        try {
+            sendReport(reportFile);
+        } catch (SOAPException e) {
+            throw new RuntimeException("Something went wrong during sending a report to the router service.", e);
         }
     }
 
@@ -103,12 +109,7 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
         message.saveChanges();
 
         try (final SOAPConnection soapConnection = SOAPConnectionFactory.newInstance().createConnection()) {
-            final SOAPMessage call = soapConnection.call(message, REPORT_SEND_URL);
-
-            System.out.println("\n\n");
-            call.writeTo(System.out);
-            System.out.println("\n\n");
-
+            soapConnection.call(message, REPORT_SEND_URL);
         } catch (Exception e) {
             e.printStackTrace();
         }

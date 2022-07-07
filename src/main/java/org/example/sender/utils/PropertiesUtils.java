@@ -13,7 +13,8 @@ public final class PropertiesUtils {
     final static private Properties properties;
 
     static {
-        try (InputStream input = new FileInputStream("/WEB-INF/classes/application.properties")) {
+        try (InputStream input =
+                     new FileInputStream("/opt/tomcat/webapps/sender/WEB-INF/classes/application.properties")) {
             properties = new Properties();
             properties.load(input);
         } catch (IOException e) {

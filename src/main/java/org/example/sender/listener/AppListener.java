@@ -21,20 +21,17 @@ public class AppListener implements ServletContextListener {
     @Override
     public void contextInitialized(final ServletContextEvent event) {
         final ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("GMT+3"));
-        final ZonedDateTime nextRunTime = currentTime.withHour(0).withMinute(1).withSecond(0);
-        //ZonedDateTime nextRunTime = currentTime.withHour(22).withMinute(0).withSecond(0);
+        ZonedDateTime nextRunTime = currentTime.withHour(22).withMinute(0).withSecond(0);
 
         final long initialDelay;
         if (currentTime.isAfter(nextRunTime)) {
-            initialDelay = Duration.between(currentTime, nextRunTime.plusMinutes(1)).getSeconds();
-//            initialDelay = Duration.between(currentTime, nextRunTime.plusDays(1)).getSeconds();
+            initialDelay = Duration.between(currentTime, nextRunTime.plusDays(1)).getSeconds();
         } else {
             initialDelay = Duration.between(currentTime, nextRunTime).getSeconds();
         }
 
         scheduler.scheduleAtFixedRate(new ReportSender<>(PDFReportProvider::new),
-                initialDelay, 1, TimeUnit.MINUTES);
-//                initialDelay, 1, TimeUnit.DAYS);
+                initialDelay, 1, TimeUnit.DAYS);
     }
 
     @Override
