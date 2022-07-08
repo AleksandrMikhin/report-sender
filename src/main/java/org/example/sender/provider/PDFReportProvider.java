@@ -28,7 +28,8 @@ public class PDFReportProvider implements ReportProvider{
 
     static {
         try {
-            final String FONT_PATH = PropertiesUtils.getProperty("sender.base-font.path");
+            final String FONT_PATH = "${CATALINA_HOME:/opt/tomcat}/webapps/sender/"
+                    + PropertiesUtils.getProperty("sender.base-font.path");
             BASE_FONT = BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         } catch (IOException | DocumentException e) {
             throw new RuntimeException("Base font not found", e);
