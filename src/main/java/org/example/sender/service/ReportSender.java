@@ -88,7 +88,7 @@ public class ReportSender<T extends ReportProvider> implements Runnable {
         }
     }
 
-    public static void sendReport(File file) throws SOAPException {
+    private static void sendReport(File file) throws SOAPException {
         final MessageFactory messageFactory = MessageFactory.newInstance();
         final SOAPMessage message = messageFactory.createMessage();
 
