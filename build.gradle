@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'war'
+    id "com.avast.gradle.docker-compose" version "0.14.9"
 }
 
 group 'org.example'
@@ -33,3 +34,12 @@ dependencies {
 war{
     archiveName 'sender.war'
 }
+
+dockerCompose {
+    useComposeFiles = ["docker/docker-compose.yaml"]
+    startedServices = ['report-sender']
+    projectName = 'report-sender'
+}
+
+composeUp.dependsOn(clean, war.mustRunAfter(clean))
+

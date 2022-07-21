@@ -13,7 +13,7 @@ public final class PropertiesUtils {
     final static private Properties properties;
 
     static {
-        try (InputStream input = new FileInputStream("${CATALINA_HOME:-/opt/tomcat}"
+        try (InputStream input = new FileInputStream(System.getenv("CATALINA_HOME")
                 + "/webapps/sender/WEB-INF/classes/application.properties")) {
             properties = new Properties();
             properties.load(input);

@@ -16,12 +16,14 @@ import java.util.concurrent.TimeUnit;
 @WebListener
 public class AppListener implements ServletContextListener {
 
+    private static final int SECONDS_PER_DAY = 86400;
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     public void contextInitialized(final ServletContextEvent event) {
         final ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("GMT+3"));
-        ZonedDateTime nextRunTime = currentTime.withHour(22).withMinute(0).withSecond(0);
+        ZonedDateTime nextRunTime = currentTime.withHour(22).withMinute(30).withSecond(0);
 
         final long initialDelay;
         if (currentTime.isAfter(nextRunTime)) {
@@ -31,7 +33,7 @@ public class AppListener implements ServletContextListener {
         }
 
         scheduler.scheduleAtFixedRate(new ReportSender<>(PDFReportProvider::new),
-                initialDelay, 1, TimeUnit.DAYS);
+                initialDelay, SECONDS_PER_DAY, TimeUnit.SECONDS);
     }
 
     @Override
