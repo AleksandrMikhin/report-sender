@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Daily report-sender service is alive</title>
+  </head>
+  <body>
+    <center>
+      <h1>Daily report-sender service is alive</h1>
+      <span th:text="'Current date: ' + ${date}"></span>
+      <p></p>
+      <form action="/app" method="post">
+          <button name="foo" value="Send">Send report now</button>
+      </form>
+    </center>
+  </body>
+</html>

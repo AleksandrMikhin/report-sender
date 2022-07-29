@@ -11,7 +11,8 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.example.sender.entity.Team;
 import org.example.sender.entity.SingleReport;
-import org.example.sender.utils.PropertiesUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,24 +23,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class PDFReportProvider implements ReportProvider{
+@Service
+public class PdfReportProvider implements ReportProvider {
 
-    private static final BaseFont BASE_FONT;
+    private static final String DATE_FORMAT_PATTERN = "yyyy_MM_dd";
 
-    static {
+    private final Font teamFont;
+    private final Font headerFont;
+    private final Font mainFont;
+
+    public PdfReportProvider(@Value("${sender.base-font}") final String fontPath) {
+        final BaseFont baseFont;
         try {
-            final String FONT_PATH = System.getenv("CATALINA_HOME") + "/webapps/sender"
-                    + PropertiesUtils.getProperty("sender.base-font.path");
-            BASE_FONT = BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            baseFont = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         } catch (IOException | DocumentException e) {
             throw new RuntimeException("Base font not found", e);
         }
+        teamFont = new Font(baseFont, 12, Font.BOLD, BaseColor.BLACK);
+        headerFont = new Font(baseFont, 12, Font.NORMAL, BaseColor.BLACK);
+        mainFont = new Font(baseFont, 10, Font.NORMAL, BaseColor.BLACK);
     }
-
-    private static final Font TEAM_FONT = new Font(BASE_FONT, 12, Font.BOLD, BaseColor.BLACK);
-    private static final Font HEADER_FONT = new Font(BASE_FONT, 12, Font.NORMAL, BaseColor.BLACK);
-    private static final Font MAIN_FONT = new Font(BASE_FONT, 10, Font.NORMAL, BaseColor.BLACK);
-    private static final String DATE_FORMAT_PATTERN = "yyyy_MM_dd";
 
     @Override
     public File createReport(final List<Team> teams, final Date reportDate) throws DocumentException, IOException {
@@ -52,17 +55,17 @@ public class PDFReportProvider implements ReportProvider{
         document.open();
 
         final Paragraph headerParagraph = new Paragraph();
-        headerParagraph.add(new Paragraph("Daily generated: " + reportDate, HEADER_FONT));
+        headerParagraph.add(new Paragraph("Daily generated: " + reportDate, headerFont));
         addEmptyLine(headerParagraph, 1);
         document.add(headerParagraph);
 
         if (teams.isEmpty()) {
             document.add(new Paragraph("Something went wrong: accountant service's given back an empty response.",
-                    MAIN_FONT));
+                    mainFont));
         } else {
             for (final Team team : teams) {
                 final Paragraph teamParagraph = new Paragraph();
-                teamParagraph.add(new Paragraph("Team: " + team.getColor(), TEAM_FONT));
+                teamParagraph.add(new Paragraph("Team: " + team.getColor(), teamFont));
                 addEmptyLine(teamParagraph, 1);
                 document.add(teamParagraph);
                 document.add(createTeamTable(team));
@@ -83,14 +86,14 @@ public class PDFReportProvider implements ReportProvider{
         table.addCell(new PdfPCell(tableActivityHeader));
 
         for (final SingleReport singleReport : team.getSingleReports()) {
-            table.addCell(new Paragraph(singleReport.getLastName() + " " + singleReport.getFirstName(), MAIN_FONT));
+            table.addCell(new Paragraph(singleReport.getLastName() + " " + singleReport.getFirstName(), mainFont));
             table.addCell(getTasksCell(singleReport));
         }
         return table;
     }
 
     private PdfPCell getHeaderCell(final String description) {
-        final PdfPCell spentTimeCell = new PdfPCell(new Paragraph(description, HEADER_FONT));
+        final PdfPCell spentTimeCell = new PdfPCell(new Paragraph(description, headerFont));
         spentTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
         spentTimeCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         spentTimeCell.setBorderWidth(2);
@@ -102,10 +105,10 @@ public class PDFReportProvider implements ReportProvider{
         table.setWidths(new int[]{80, 20});
         singleReport.getTasks()
                 .forEach(task -> {
-                    table.addCell(new Paragraph(task.getText(), MAIN_FONT));
+                    table.addCell(new Paragraph(task.getText(), mainFont));
 
                     final PdfPCell spentTimeCell = new PdfPCell(
-                            new Paragraph(Double.toString(task.getTimeSpent()), MAIN_FONT));
+                            new Paragraph(Double.toString(task.getTimeSpent()), mainFont));
                     spentTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
                     spentTimeCell.setBorder(3);
                     table.addCell(spentTimeCell);

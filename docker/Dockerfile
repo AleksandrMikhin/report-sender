@@ -1,6 +1,6 @@
-FROM tomcat:jdk11-corretto
+FROM openjdk:11
 
-COPY ./build/libs /usr/local/tomcat/webapps
+COPY ./build/libs /opt
 
-EXPOSE 8080
-CMD ["catalina.sh", "run"]
+WORKDIR /opt
+CMD ["java", "-jar", "sender.jar", "org.example.sender.SenderApplication"]

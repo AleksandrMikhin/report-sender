@@ -1,7 +1,8 @@
 plugins {
     id 'java'
-    id 'war'
-    id "com.avast.gradle.docker-compose" version "0.14.9"
+    id "org.springframework.boot" version "$springBootVersion"
+    id "io.spring.dependency-management" version "$springDependencyManagementVersion"
+    id "com.avast.gradle.docker-compose" version "$dockerComposePluginVersion"
 }
 
 group 'org.example'
@@ -11,28 +12,28 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    lombokVersion='1.18.24'
-}
-
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 
 dependencies {
-    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
-    implementation 'jakarta.xml.soap:jakarta.xml.soap-api:3.0.0'
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-    implementation 'com.sun.xml.messaging.saaj:saaj-impl:3.0.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf:$springBootVersion"
 
-    implementation 'com.itextpdf:itextpdf:5.5.13.3'
+    implementation "jakarta.xml.soap:jakarta.xml.soap-api:$jakartaSoapVersion"
+    implementation "jakarta.xml.bind:jakarta.xml.bind-api:$jakartaBindingVersion"
+    implementation "jakarta.activation:jakarta.activation-api:$jakartaActivationVersion"
+
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    implementation "com.itextpdf:itextpdf:$itextPdfVersion"
 
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 }
 
-war{
-    archiveName 'sender.war'
+bootJar {
+    archiveName 'sender.jar'
 }
 
 dockerCompose {
@@ -41,5 +42,4 @@ dockerCompose {
     projectName = 'report-sender'
 }
 
-composeUp.dependsOn(clean, war.mustRunAfter(clean))
-
+composeUp.dependsOn(clean, bootJar.mustRunAfter(clean))
